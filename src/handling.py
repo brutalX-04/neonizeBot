@@ -7,7 +7,7 @@ from neonize.proto.waE2E.WAWebProtobufsE2E_pb2 import (
 )
 import os, ffmpeg
 
-from . import tiktok
+from . import tiktok, instagram
 
 
 class rebuild:
@@ -54,46 +54,25 @@ class send_message:
 
 
 class media:
-	def download_mp4(client, chat, message, params_id):
-		typ, url = params_id.split(" ")
+	def download_mp4(client, chat, message, text):
+		typ, url = text.split(" ")
 		if typ == ".mp4_tik":
-			response = tiktok.download(url, "mp4")
-			if response["status"] == "succes":
-				client.send_video(
-					chat,
-					"data/media/download.mp4",
-					caption="done",
-					quoted=message
-					)
-				os.remove("data/media/download.mp4")
-			else:
-				client.reply_message("failled: %s"%(response["message"]), message)
+			tiktok.download(client, chat, message, url, "video")
+		elif typ == ".mp4_ig":
+			instagram.download(client, chat, message, url, "video")
 
-	def download_mp3(client, chat, message, params_id):
-		typ, url = params_id.split(" ")
-		if typ == ".audio_tik" or typ == ".ptt_tik":
-			response = tiktok.download(url, "mp3")
-			if response["status"] == "succes":
-				if typ == ".audio_tik":
-					client.send_audio(
-		                chat,
-		                "data/media/download.mp3",
-		                quoted=message,
-		            )
-				else:
-					rebuild_mp3 = rebuild.mp3("data/media/download.mp3")
-					if rebuild_mp3 == "succes":
-						client.send_audio(
-			                chat,
-			                "data/media/download_rebuild.mp3",
-			                ptt=True,
-			                quoted=message,
-			            )
-						os.remove("data/media/download_rebuild.mp3")
-					else:
-						client.reply_message("failled rebuild mp3", message)
+	def download_mp3(client, chat, message, text):
+		typ, url = text.split(" ")
+		if typ == ".audio_tik":
+			tiktok.download(client, chat, message, url, "audio")
+		elif typ == ".ptt_tik":
+			tiktok.download(client, chat, message, url, "ptt")
+		elif typ == ".audio_ig":
+			instagram.download(client, chat, message, url, "audio")
+		elif typ == ".ptt_ig":
+			instagram.download(client, chat, message, url, "ptt")
 
-				os.remove("data/media/download.mp3")
-
-			else:
-				client.reply_message("failled: %s"%(response["message"]), message)
+	def download_image(client, chat, message, text):
+		typ, url = text.split(" ")
+		if typ == ".img_ig":
+			instagram.download(client, chat, message, url, "image")

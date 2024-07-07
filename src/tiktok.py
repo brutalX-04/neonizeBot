@@ -1,5 +1,5 @@
-from . import config
-import requests, re, json
+from . import config, handling
+import requests, re, json, os
 
 
 
@@ -44,10 +44,13 @@ def fetch(url):
 			response_json["media"]["video"] = url_video
 
 		# -> Audio download handler
-		data_music = items["music"]
-		url_music = data_music["playUrl"]
-		if url_video:
-			response_json["media"]["music"] = url_music
+		try:
+			data_music = items["music"]
+			url_music = data_music["playUrl"]
+			if url_music:
+				response_json["media"]["music"] = url_music
+		except:
+			response_json["media"]["music"] = None
 
 		return response_json
 
@@ -55,7 +58,7 @@ def fetch(url):
 		return { "status": "failled", "message": str(e) }
 
 
-def download(url, typ):
+def download(client, chat, message, url, typ):
 	try:
 		with requests.Session() as session:
 
@@ -67,29 +70,55 @@ def download(url, typ):
 			items = json_data["itemInfo"]["itemStruct"]
 
 			# -> Video download handler
-			if typ == "mp4":
+			if typ == "video":
 				data_video = items["video"]
 				url_video = data_video["playAddr"]
+
 				if url_video:
 					get_media = session.get(url_video, cookies={"cookie": cookies})
 					with open("data/media/download.mp4", "wb") as file:
 						file.write(get_media.content)
-				else:
-					return { "status": "failled", "message": "Url not found" }
+					client.send_video(
+						chat,
+						"data/media/download.mp4",
+						caption="done",
+						quoted=message
+						)
+					os.remove("data/media/download.mp4")
+
 
 
 			# -> Audio download handler
-			if typ == "mp3":
+			if typ == "audio" or typ == "ptt":
 				data_music = items["music"]
 				url_music = data_music["playUrl"]
+
 				if url_music:
 					get_media = session.get(url_music, cookies={"cookie": cookies})
 					with open("data/media/download.mp3", "wb") as file:
 						file.write(get_media.content)
-				else:
-					return { "status": "failled", "message": "Url not found" }
 
-			return { "status": "succes" }
+					if typ == "audio":
+						client.send_audio(
+			                chat,
+			                "data/media/download.mp3",
+			                quoted=message,
+			            )
+					else:
+						rebuild_mp3 = handling.rebuild.mp3("data/media/download.mp3")
+						if rebuild_mp3 == "succes":
+							client.send_audio(
+				                chat,
+				                "data/media/download_rebuild.mp3",
+				                ptt=True,
+				                quoted=message,
+				            )
+							os.remove("data/media/download_rebuild.mp3")
+						else:
+							client.reply_message("failled rebuild mp3", message)
+
+					os.remove("data/media/download.mp3")
+
 
 	except Exception as e:
-		return { "status": "failled", "message": str(e) }
+		client.reply_message("failled: %s"%(e.__str__()), message)
