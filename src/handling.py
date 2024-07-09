@@ -8,7 +8,8 @@ from neonize.proto.waE2E.WAWebProtobufsE2E_pb2 import (
 import os, ffmpeg
 from . import ( tiktok,
 	instagram,
-	pinterest
+	pinterest,
+	bing_image
 )
 
 
@@ -83,3 +84,5 @@ class media:
 class scraper:
 	def pinterest(client, chat, message, keywords):
 		pinterest.get_first_image(client, chat, message, keywords)
+	def bing(client, chat, message, keywords):
+		bing_image.get(client, chat, message, keywords)

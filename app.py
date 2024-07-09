@@ -146,6 +146,10 @@ def handler(client: NewClient, message: MessageEv):
         keywords = text.split(" ")[1]
         scraper.pinterest(client, chat, message, keywords)
 
+    elif ".bing_img " in text:
+        keywords = text.split(" ")[1]
+        scraper.bing(client, chat, message, keywords)
+
 
     if "extendedTextMessage" in msg_type.__str__():
         url = msg_type.extendedTextMessage.matchedText

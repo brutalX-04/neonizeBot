@@ -20,6 +20,9 @@ menu = """
 ├┬ ▹ *pinterest image*
 │└ .pins keywords
 │
+├┬ ▹ *bing image*
+│└ .bing_img keywords
+│
 ├┬ ▹ *groq ai*
 │└ .ai text-question
 │
