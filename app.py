@@ -20,14 +20,14 @@ from neonize.proto.waE2E.WAWebProtobufsE2E_pb2 import (
     DeviceListMetadata
 )
 from neonize.types import MessageServerID
-from neonize.utils import log
+from neonize.utils import log, extract_text
 from neonize.utils.enum import ReceiptType, MediaType
 from neonize.utils.message import get_message_type
 from neonize.utils.iofile import get_bytes_from_name_or_url
 
 
-from src import tiktok, config, instagram, groq
-from src.handling import media, send_message
+from src import tiktok, config, instagram, groq, rmbg
+from src.handling import media, send_message, scraper
 import json, os, sys
 
 # --> Set
@@ -82,6 +82,7 @@ def handler(client: NewClient, message: MessageEv):
     text = message.Message.conversation or message.Message.extendedTextMessage.text
     chat = message.Info.MessageSource.Chat
     msg_type = get_message_type(message)
+    #print(msg_type)
 
     match text:
         case "debug":
@@ -120,6 +121,11 @@ def handler(client: NewClient, message: MessageEv):
             )
             return
 
+        case ".rmbg":
+            quoted = msg_type.extendedTextMessage.contextInfo.quotedMessage
+            if "imageMessage" in quoted.__str__():
+                rmbg.remove(client, message, chat, quoted)
+
     if ".ai " in text:
         ai_text = groq.chat(text.split(" ")[1])
         client.reply_message(ai_text, message)
@@ -135,6 +141,10 @@ def handler(client: NewClient, message: MessageEv):
     elif ".img_ig " in text:
         media.download_image(client, chat, message, text)
         return
+
+    elif ".pins " in text:
+        keywords = text.split(" ")[1]
+        scraper.pinterest(client, chat, message, keywords)
 
 
     if "extendedTextMessage" in msg_type.__str__():
@@ -190,6 +200,11 @@ def handler(client: NewClient, message: MessageEv):
             media.download_image(client, chat, message, params_id)
 
         return
+
+    elif "imageMessage" in msg_type.__str__():
+        caption = msg_type.imageMessage.caption
+        if caption == ".rmbg":
+            rmbg.remove(client, message, chat, msg_type)
 
 
 

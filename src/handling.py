@@ -6,8 +6,10 @@ from neonize.proto.waE2E.WAWebProtobufsE2E_pb2 import (
     DeviceListMetadata
 )
 import os, ffmpeg
-
-from . import tiktok, instagram
+from . import ( tiktok,
+	instagram,
+	pinterest
+)
 
 
 class rebuild:
@@ -76,3 +78,8 @@ class media:
 		typ, url = text.split(" ")
 		if typ == ".img_ig":
 			instagram.download(client, chat, message, url, "image")
+
+
+class scraper:
+	def pinterest(client, chat, message, keywords):
+		pinterest.get_first_image(client, chat, message, keywords)
