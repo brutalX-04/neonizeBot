@@ -22,7 +22,7 @@ def remove(client, message, chat, url):
             with open(path, 'wb') as out:
                 out.write(response.content)
 
-            client.send_image(chat, path, caption="done", quoted=message)
+            client.send_image(chat, path, quoted=message)
 
         else:
             client.reply_message("failled: %s"%(response.text), message)

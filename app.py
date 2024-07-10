@@ -138,17 +138,19 @@ def handler(client: NewClient, message: MessageEv):
         media.download_mp3(client, chat, message, text)
         return
 
-    elif ".img_ig " in text:
+    elif ".img_ig " in text or ".ss_web " in text:
         media.download_image(client, chat, message, text)
         return
 
     elif ".pins " in text:
         keywords = text.split(" ")[1]
         scraper.pinterest(client, chat, message, keywords)
+        return
 
     elif ".bing_img " in text:
         keywords = text.split(" ")[1]
         scraper.bing(client, chat, message, keywords)
+        return
 
 
     if "extendedTextMessage" in msg_type.__str__():

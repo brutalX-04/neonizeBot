@@ -81,7 +81,6 @@ def download(client, chat, message, url, typ):
 					client.send_video(
 						chat,
 						"data/media/download.mp4",
-						caption="done",
 						quoted=message
 						)
 					os.remove("data/media/download.mp4")

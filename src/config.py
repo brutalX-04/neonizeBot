@@ -23,6 +23,9 @@ menu = """
 ├┬ ▹ *bing image*
 │└ .bing_img keywords
 │
+├┬ ▹ *screnshot web*
+│└ .ss_web url
+│
 ├┬ ▹ *groq ai*
 │└ .ai text-question
 │

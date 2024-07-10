@@ -9,7 +9,8 @@ import os, ffmpeg
 from . import ( tiktok,
 	instagram,
 	pinterest,
-	bing_image
+	bing_image,
+	ss_web
 )
 
 
@@ -79,6 +80,11 @@ class media:
 		typ, url = text.split(" ")
 		if typ == ".img_ig":
 			instagram.download(client, chat, message, url, "image")
+		elif typ == ".ss_web":
+			if "https://" in url or "http://" in url:
+				ss_web.download(client, chat, message, url)
+			else:
+				client.reply_message("url https:// or http:// required", message)
 
 
 class scraper:

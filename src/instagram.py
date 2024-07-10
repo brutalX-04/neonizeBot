@@ -96,7 +96,7 @@ def download(client, chat, message, url, typ):
 					with open(path, "wb") as file:
 						file.write(get_media.content)
 
-					client.send_image(chat, path, caption="done", quoted=message)
+					client.send_image(chat, path, quoted=message)
 					os.remove(path)
 
 			else:
@@ -112,7 +112,7 @@ def download(client, chat, message, url, typ):
 					with open(path, "wb") as file:
 						file.write(get_media.content)
 
-					client.send_video(chat, path, caption="done", quoted=message)
+					client.send_video(chat, path, quoted=message)
 					os.remove(path)
 
 			else:

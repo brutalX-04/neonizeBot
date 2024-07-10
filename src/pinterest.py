@@ -45,7 +45,6 @@ def get_first_image(client, chat, message, keywords):
 					client.send_image(
 						chat,
 						"data/media/download.jpg",
-						caption="done",
 						quoted=message
 						)
 					os.remove("data/media/download.jpg")
