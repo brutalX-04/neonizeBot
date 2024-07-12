@@ -136,7 +136,7 @@ def download(client, chat, message, url, typ):
 				cards = []
 				list_filepath = []
 				body = "Done !"
-				footer = "source: %s"%(url)
+				footer = "source: instagram \npost_id: %s"%(ids)
 				for url in url_video:
 					filepath = "data/media/download" + count.__str__() + ".mp4"
 					get_media = requests.get(url, cookies={"cookie": cookies})
