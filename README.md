@@ -1,11 +1,11 @@
-# Please set cookies and apikey before run script
+<h2> Please set cookies and apikey before run script</h2>
 
 <h3 align="center">
   Hello Worlds!, I'm brutalX
 </h3>
 
 <p align="center">
-  <img width="100%" height="200" src="https://i.ibb.co/6bCbFsq/20231203-195839.jpg">
+  <img width="450" height="200" src="https://i.ibb.co/6bCbFsq/20231203-195839.jpg">
 </p>
 
 <p align="center">
@@ -26,6 +26,6 @@
 </h3>
 
 <p align="center">
-  <a href="https://www.facebook.com/brut4l.id"><img width="30" height="30" border-radius="50%" src="https://i.ibb.co/JRtYfZF/facebook.jpg"></a>
-  <a href="https://api.whatsapp.com/send/?phone=6285219809271&text=Assalamualaikum"><img width="30" height="30" border-radius="50%" src="https://i.ibb.co/QcQ6yhY/whatsapp.png"></a>
+  <a href="https://www.facebook.com/brut4l.id"><img width="30" height="30" border-radius="50" src="https://i.ibb.co/JRtYfZF/facebook.jpg"></a>
+  <a href="https://api.whatsapp.com/send/?phone=6285219809271&text=Assalamualaikum"><img width="30" height="30" border-radius="50" src="https://i.ibb.co/QcQ6yhY/whatsapp.png"></a>
 </p>
