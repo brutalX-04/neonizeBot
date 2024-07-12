@@ -3,7 +3,7 @@ import os
 import signal
 import sys
 from datetime import timedelta
-from neonize.client import NewClient
+from neonize.client import NewClient, ExtendedTextMessage
 from neonize.events import (
     ConnectedEv,
     MessageEv,
@@ -17,7 +17,8 @@ from neonize.proto.waE2E.WAWebProtobufsE2E_pb2 import (
     FutureProofMessage,
     InteractiveMessage,
     MessageContextInfo,
-    DeviceListMetadata
+    DeviceListMetadata,
+    ContextInfo
 )
 from neonize.types import MessageServerID
 from neonize.utils import log, extract_text
@@ -82,7 +83,6 @@ def handler(client: NewClient, message: MessageEv):
     text = message.Message.conversation or message.Message.extendedTextMessage.text
     chat = message.Info.MessageSource.Chat
     msg_type = get_message_type(message)
-    #print(msg_type)
 
     match text:
         case "debug":
@@ -110,7 +110,7 @@ def handler(client: NewClient, message: MessageEv):
                                     buttons=[
                                         InteractiveMessage.NativeFlowMessage.NativeFlowButton(
                                             name="cta_url",
-                                            buttonParamsJSON='{"display_text":"Profile","url":"https://profile.brutalx.my.id","merchant_url":"https://profile.brutalx.my.id"}',
+                                            buttonParamsJSON='{"display_text":"Profile","url":"https://github.com/brutalX-04","merchant_url":"https://github.com/brutalX-04"}',
                                         )
                                     ]
                                 ),
@@ -159,9 +159,10 @@ def handler(client: NewClient, message: MessageEv):
             if "tiktok" in url:
                 data = tiktok.fetch(url)
                 if data["status"] == "succes":
+                    post_id = data["info"]["post_id"]
                     button_rows = []
-                    author = "\n\nauthor:\n  username: %s \n  nickname: %s"%(data["author"]["username"], data["author"]["nickname"])
-                    body = url + author
+                    author = "\n\ninfo:\n  username: %s \n  nickname: %s"%(data["author"]["username"], data["author"]["nickname"])
+                    body = "source: tiktok \npost_id: " + post_id + author
                     music = data["media"]["music"]
                     video = data["media"]["video"]
                     button_rows.append({"title":"MP4","description":"convert url to mp4","id":".mp4_tik "+url})
@@ -172,11 +173,12 @@ def handler(client: NewClient, message: MessageEv):
                     send_message.interactive_message(client, chat, body, button_rows)
 
             elif "instagram" in url:
-                data = instagram.fetch(url)
+                ids = url.split("/")[4]
+                data = instagram.fetch(ids)
                 if data["status"] == "succes":
                     button_rows = []
-                    author = "\n\nauthor:\n  username: %s\n  fullname: %s\n  like: %s\n  comment: %s"%(data["author"]["username"], data["author"]["fullname"], data["post_info"]["like"], data["post_info"]["comment"])
-                    body = url + author
+                    author = "\n\ninfo:\n  username: %s\n  fullname: %s\n  like: %s\n  comment: %s"%(data["author"]["username"], data["author"]["fullname"], data["post_info"]["like"], data["post_info"]["comment"])
+                    body = "source: instagram \npost_id: " + ids + author
                     music = data["media"]["music"]["url"]
                     video = data["media"]["video"]["url"]
                     image = data["media"]["image"]["url"]

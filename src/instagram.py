@@ -1,14 +1,21 @@
+from neonize.proto.waE2E.WAWebProtobufsE2E_pb2 import (
+    Message,
+    FutureProofMessage,
+    InteractiveMessage,
+    MessageContextInfo,
+    DeviceListMetadata
+)
+
 from . import config, handling
 import requests, json, os
 
 cookies = config.instagram_cookies
 
 
-def fetch(url):
+def fetch(ids):
 	try:
 		response_json = { "status": {},"author": {}, "post_info": {}, "media": {} }
 
-		ids = url.split("/")[4]
 		data = requests.get("https://www.instagram.com/p/%s/?__a=1&__d=dis"%(ids), cookies={ "cookie": cookies }).json()
 
 		product_type = data["items"][0]["product_type"]
@@ -36,14 +43,12 @@ def fetch(url):
 		elif product_type == "carousel_container":
 			carousel_media = data["items"][0]["carousel_media"]
 			for x in carousel_media:
-				image_url = x["image_versions2"]["candidates"][0]["url"]
 				try:
 					video_url = x["video_versions"][0]["url"]
 					list_url_video.append(video_url)
 				except:
-					pass
-
-				list_url_image.append(image_url)
+					image_url = x["image_versions2"]["candidates"][0]["url"]
+					list_url_image.append(image_url)
 
 		# fetch url clips
 		elif product_type == "clips":
@@ -83,7 +88,8 @@ def fetch(url):
 
 
 def download(client, chat, message, url, typ):
-	data = fetch(url)
+	ids = url.split("/")[4]
+	data = fetch(ids)
 
 	if data["status"] == "succes":
 		if typ == "image":
@@ -91,13 +97,32 @@ def download(client, chat, message, url, typ):
 			url_image = data["media"]["image"]["url"]
 
 			if len(url_image)>0:
+				count = 1
+				cards = []
+				list_filepath = []
+				body = "Done !"
+				footer = "source: instagram \npost_id: %s"%(ids)
 				for url in url_image:
+					filepath = "data/media/download" + count.__str__() + ".jpg"
 					get_media = requests.get(url, cookies={"cookie": cookies})
-					with open(path, "wb") as file:
+					with open(filepath, "wb") as file:
 						file.write(get_media.content)
 
-					client.send_image(chat, path, quoted=message)
-					os.remove(path)
+					cards.append({
+						"header": InteractiveMessage.Header(hasMediaAttachment=True, imageMessage=client.build_image_message(filepath).imageMessage),
+                        'footer': InteractiveMessage.Footer(text="media " + count.__str__()),
+                        'nativeFlowMessage': InteractiveMessage.NativeFlowMessage(
+                            buttons=[
+                                InteractiveMessage.NativeFlowMessage.NativeFlowButton(name="index")
+                            ]
+                        )
+					})
+					list_filepath.append(filepath)
+					count+=1
+
+				handling.send_message.carousel(client, chat, body, footer, cards)
+				for x in list_filepath:
+					os.remove(x)
 
 			else:
 				client.reply_message("failled: no image content", message)
@@ -107,13 +132,32 @@ def download(client, chat, message, url, typ):
 			url_video = data["media"]["video"]["url"]
 
 			if len(url_video)>0:
+				count = 1
+				cards = []
+				list_filepath = []
+				body = "Done !"
+				footer = "source: %s"%(url)
 				for url in url_video:
+					filepath = "data/media/download" + count.__str__() + ".mp4"
 					get_media = requests.get(url, cookies={"cookie": cookies})
-					with open(path, "wb") as file:
+					with open(filepath, "wb") as file:
 						file.write(get_media.content)
 
-					client.send_video(chat, path, quoted=message)
-					os.remove(path)
+					cards.append({
+						"header": InteractiveMessage.Header(hasMediaAttachment=True, videoMessage=client.build_video_message(filepath).videoMessage),
+                        'footer': InteractiveMessage.Footer(text="media " + count.__str__()),
+                        'nativeFlowMessage': InteractiveMessage.NativeFlowMessage(
+                            buttons=[
+                                InteractiveMessage.NativeFlowMessage.NativeFlowButton(name="index")
+                            ]
+                        )
+					})
+					list_filepath.append(filepath)
+					count+=1
+
+				handling.send_message.carousel(client, chat, body, footer, cards)
+				for x in list_filepath:
+					os.remove(x)
 
 			else:
 				client.reply_message("failled: no video content", message)

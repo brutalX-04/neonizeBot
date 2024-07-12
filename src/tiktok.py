@@ -3,7 +3,6 @@ import requests, re, json, os
 
 
 
-cookies = config.tiktok_cookies
 headers = {
 	'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
 	'accept-language': 'en-US,en;q=0.9,id;q=0.8',
@@ -23,13 +22,17 @@ headers = {
 
 def fetch(url):
 	try:
-		get  = requests.get(url, cookies={"cookie": cookies}, headers=headers)
+		get  = requests.get(url, headers=headers)
 
 		# -> Data parsing to json
 		details  = re.search('"webapp.video-detail":{(.*?)},"webapp.a-b"', get.text).group(1)
 		json_data = json.loads("{"+details+"}")
 		items = json_data["itemInfo"]["itemStruct"]
-		response_json = { "status": "succes", "author": {}, "media": { "video": None, "music": None} }
+		response_json = { "status": "succes", "author": {}, "media": { "video": None, "music": None}, "info": {} }
+
+		# -> Post Info
+		post_id = items["id"]
+		response_json["info"] = { "post_id": post_id }
 
 		# -> Author Information
 		data_author = items["author"]
@@ -62,7 +65,7 @@ def download(client, chat, message, url, typ):
 	try:
 		with requests.Session() as session:
 
-			get  = session.get(url, cookies={"cookie": cookies}, headers=headers)
+			get  = session.get(url, headers=headers)
 
 			# -> Data parsing to json
 			details  = re.search('"webapp.video-detail":{(.*?)},"webapp.a-b"', get.text).group(1)
@@ -75,7 +78,7 @@ def download(client, chat, message, url, typ):
 				url_video = data_video["playAddr"]
 
 				if url_video:
-					get_media = session.get(url_video, cookies={"cookie": cookies})
+					get_media = session.get(url_video)
 					with open("data/media/download.mp4", "wb") as file:
 						file.write(get_media.content)
 					client.send_video(
@@ -93,7 +96,7 @@ def download(client, chat, message, url, typ):
 				url_music = data_music["playUrl"]
 
 				if url_music:
-					get_media = session.get(url_music, cookies={"cookie": cookies})
+					get_media = session.get(url_music)
 					with open("data/media/download.mp3", "wb") as file:
 						file.write(get_media.content)
 

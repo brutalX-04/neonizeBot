@@ -25,7 +25,7 @@ class rebuild:
 
 
 class send_message:
-    def interactive_message(client, chat, body, rows):
+	def interactive_message(client, chat, body, rows):
 	    client.send_message(
 	        chat,
 	        Message(
@@ -51,6 +51,28 @@ class send_message:
 	                            ]
 	                        ),
 	                    ),
+	                )
+	            )
+	        )
+	    )
+
+	def carousel(client, chat, body, footer, cards):
+		client.send_message(
+	        chat,
+	        Message(
+	            viewOnceMessage=FutureProofMessage(
+	                message=Message(
+	                    messageContextInfo=MessageContextInfo(
+	                        deviceListMetadata=DeviceListMetadata(), 
+	                        deviceListMetadataVersion=2
+	                    ), 
+	                    interactiveMessage=InteractiveMessage(
+	                        body=InteractiveMessage.Body(text=body),
+	                        footer=InteractiveMessage.Footer(text=footer),
+	                        carouselMessage=InteractiveMessage.CarouselMessage(
+	                            cards=cards
+	                        )
+	                    )
 	                )
 	            )
 	        )

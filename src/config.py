@@ -32,7 +32,6 @@ menu = """
 └ more ?, _coming soon_
 """
 
-tiktok_cookies = ""
 instagram_cookies = ''
 groq_apikey = []
 rembg_apikey = []
