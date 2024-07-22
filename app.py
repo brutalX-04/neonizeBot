@@ -143,12 +143,12 @@ def handler(client: NewClient, message: MessageEv):
         return
 
     elif ".pins " in text:
-        keywords = text.split(" ")[1]
+        keywords = text.split(".pins ")[1]
         scraper.pinterest(client, chat, message, keywords)
         return
 
     elif ".bing_img " in text:
-        keywords = text.split(" ")[1]
+        keywords = text.split(".bing_img ")[1]
         scraper.bing(client, chat, message, keywords)
         return
 
